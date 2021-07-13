@@ -4,7 +4,7 @@ const InvariantError = require('../../exceptions/InvariantError')
 const NotFoundError = require('../../exceptions/NotFoundError')
 const { mapDBToModel } = require('../../utils')
 
-class openMusicService {
+class OpenMusicService {
   constructor () {
     this._pool = new Pool()
   }
@@ -22,9 +22,7 @@ class openMusicService {
 
     const result = await this._pool.query(query)
 
-    if (!result.rows[0].id) {
-      throw new InvariantError('Lagu gagal ditambahkan')
-    } 
+    if (!result.rows[0].id) throw new InvariantError('Lagu gagal ditambahkan')
     return result.rows[0].id
   }
 
@@ -40,7 +38,7 @@ class openMusicService {
     }
     const result = await this._pool.query(query)
 
-    if (!result.row.length) throw new NotFoundError('Lagu tidak ditemukan')
+    if (!result.rows.length) throw new NotFoundError('Lagu tidak ditemukan')
 
     return result.rows.map(mapDBToModel)[0]
   }
@@ -48,7 +46,7 @@ class openMusicService {
   async editSongById (id, { title, year, performer, genre, duration }) {
     const updatedAt = new Date().toISOString()
     const query = {
-      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, updated_at = $6 WHERE id = $7 RETURNING id',
+      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, updatedat = $6 WHERE id = $7 RETURNING id',
       values: [title, year, performer, genre, duration, updatedAt, id]
     }
 
@@ -59,7 +57,7 @@ class openMusicService {
 
   async deleteSongById (id) {
     const query = {
-      text: 'DELETE FROM songs WHERE id = $1',
+      text: 'DELETE FROM songs WHERE id = $1 RETURNING id',
       values: [id]
     }
 
@@ -69,4 +67,4 @@ class openMusicService {
   }
 }
 
-module.exports = openMusicService
+module.exports = OpenMusicService

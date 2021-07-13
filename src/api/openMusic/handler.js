@@ -37,7 +37,6 @@ class OpenMusicHandler {
         response.code(error.statusCode)
         return response
       }
-      console.log(error)
       const response = h.response({
         status: 'fail',
         message: 'Maaf terjadi kegagalan pada server kami.'
@@ -88,6 +87,7 @@ class OpenMusicHandler {
 
   async editSongByIdHandler (request, h) {
     try {
+      this._validator.validateSongPayload(request.payload)
       const { id } = request.params
       const { title, year, performer, genre, duration } = request.payload
       await this._service.editSongById(id, { title, year, performer, genre, duration })
