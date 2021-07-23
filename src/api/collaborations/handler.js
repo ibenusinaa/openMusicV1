@@ -1,7 +1,7 @@
 const ClientError = require('../../exceptions/ClientError')
 
 class CollaborationsHandler {
-  constructor(collaborationsService, playlistsService, validator) {
+  constructor (collaborationsService, playlistsService, validator) {
     this._collaborationsService = collaborationsService
     this._playlistsService = playlistsService
     this._validator = validator
@@ -10,7 +10,7 @@ class CollaborationsHandler {
     this.deleteCollaborationHandler = this.deleteCollaborationHandler.bind(this)
   }
 
-  async postCollaborationHandler(request, h) {
+  async postCollaborationHandler (request, h) {
     try {
       this._validator.validateCollaborationPayload(request.payload)
 
@@ -30,7 +30,6 @@ class CollaborationsHandler {
       response.code(201)
       return response
     } catch (error) {
-      
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -48,7 +47,7 @@ class CollaborationsHandler {
     }
   }
 
-  async deleteCollaborationHandler(request, h) {
+  async deleteCollaborationHandler (request, h) {
     try {
       this._validator.validateCollaborationPayload(request.payload)
 
@@ -63,7 +62,6 @@ class CollaborationsHandler {
         message: 'Kolaborasi berhasil dihapus'
       }
     } catch (error) {
-      
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',

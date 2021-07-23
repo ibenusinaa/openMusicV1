@@ -1,11 +1,11 @@
-const ClientError = require("../../exceptions/ClientError")
+const ClientError = require('../../exceptions/ClientError')
 
 class PlaylistsHandler {
-  constructor(playlistsService, openMusicService, validator) {
+  constructor (playlistsService, openMusicService, validator) {
     this._playlistsService = playlistsService
     this._openMusicService = openMusicService
     this._validator = validator
-    
+
     this.postCreatePlaylistHandler = this.postCreatePlaylistHandler.bind(this)
     this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this)
     this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this)
@@ -14,7 +14,7 @@ class PlaylistsHandler {
     this.deleteSongFromPlaylistHandler = this.deleteSongFromPlaylistHandler.bind(this)
   }
 
-  async postCreatePlaylistHandler(request, h) {
+  async postCreatePlaylistHandler (request, h) {
     try {
       this._validator.validatePostPlaylistPayload(request.payload)
 
@@ -32,26 +32,25 @@ class PlaylistsHandler {
       response.code(201)
       return response
     } catch (error) {
-
-      if(error instanceof ClientError) {
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
-          message: error.message,
+          message: error.message
         })
-        response.code(error.statusCode);
+        response.code(error.statusCode)
         return response
       }
 
       const response = h.response({
         status: 'fail',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      response.code(500);
-      return response;
+        message: 'Maaf, terjadi kegagalan pada server kami.'
+      })
+      response.code(500)
+      return response
     }
   }
 
-  async getPlaylistsHandler(request) {
+  async getPlaylistsHandler (request) {
     const { id: credentialId } = request.auth.credentials
     const playlists = await this._playlistsService.getPlaylists(credentialId)
     return {
@@ -62,14 +61,14 @@ class PlaylistsHandler {
     }
   }
 
-  async deletePlaylistByIdHandler(request, h) {
+  async deletePlaylistByIdHandler (request, h) {
     try {
       const { playlistId } = request.params
       const { id: credentialId } = request.auth.credentials
-  
+
       await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId)
       await this._playlistsService.deletePlaylistById(playlistId)
-  
+
       return {
         status: 'success',
         message: 'Playlist berhasil dihapus'
@@ -93,13 +92,13 @@ class PlaylistsHandler {
     }
   }
 
-  async addSongToPlaylistHandler(request, h) {
+  async addSongToPlaylistHandler (request, h) {
     try {
       this._validator.validateAddSongToPlaylistPayload(request.payload)
       const { playlistId } = request.params
       const { songId } = request.payload
       const { id: credentialId } = request.auth.credentials
-  
+
       await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId)
       await this._openMusicService.getSongById(songId)
       await this._playlistsService.addSongToPlaylist(playlistId, songId)
@@ -129,11 +128,11 @@ class PlaylistsHandler {
     }
   }
 
-  async getSongsOnPlaylistHandler(request, h) {
+  async getSongsOnPlaylistHandler (request, h) {
     try {
       const { playlistId } = request.params
       const { id: credentialId } = request.auth.credentials
-      
+
       await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId)
       const songs = await this._playlistsService.getSongsOnPlaylist(playlistId)
 
@@ -162,16 +161,16 @@ class PlaylistsHandler {
     }
   }
 
-  async deleteSongFromPlaylistHandler(request, h) {
+  async deleteSongFromPlaylistHandler (request, h) {
     try {
       const { playlistId } = request.params
       const { songId } = request.payload
       const { id: credentialId } = request.auth.credentials
-  
+
       await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId)
       await this._playlistsService.verifySongId(songId)
       await this._playlistsService.deleteSongFromPlaylist(playlistId, songId)
-  
+
       return {
         status: 'success',
         message: 'Lagu berhasil dihapus dari playlist'

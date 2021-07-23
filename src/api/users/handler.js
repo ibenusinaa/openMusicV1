@@ -1,14 +1,14 @@
-const ClientError = require("../../exceptions/ClientError")
+const ClientError = require('../../exceptions/ClientError')
 
 class UserHandler {
-  constructor(service, validator) {
+  constructor (service, validator) {
     this._service = service
     this._validator = validator
 
     this.postUserHandler = this.postUserHandler.bind(this)
   }
 
-  async postUserHandler(request, h) {
+  async postUserHandler (request, h) {
     try {
       this._validator.validateUserPayload(request.payload)
 
@@ -17,8 +17,8 @@ class UserHandler {
       const userId = await this._service.addUser({ username, password, fullname })
 
       const response = h.response({
-        status: "success",
-        message: "User berhasil ditambahkan",
+        status: 'success',
+        message: 'User berhasil ditambahkan',
         data: {
           userId: userId
         }
@@ -26,8 +26,7 @@ class UserHandler {
       response.code(201)
       return response
     } catch (error) {
-      
-      if(error instanceof ClientError) {
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
           message: error.message

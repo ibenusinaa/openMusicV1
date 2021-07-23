@@ -53,13 +53,13 @@ const init = async () => {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE
     },
     validate: (artifacts) => ({
       isValid: true,
       credentials: {
-        id: artifacts.decoded.payload.id,
-      },
+        id: artifacts.decoded.payload.id
+      }
     })
   })
 
@@ -104,7 +104,6 @@ const init = async () => {
       }
     }
   ])
-
 
   await server.start()
   console.log(`API running on PORT ${server.info.uri}`)

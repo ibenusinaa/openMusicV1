@@ -1,7 +1,7 @@
-const ClientError = require("../../exceptions/ClientError")
+const ClientError = require('../../exceptions/ClientError')
 
 class AuthenticationsHandler {
-  constructor(authenticationsService, usersService, tokenManager, validator) {
+  constructor (authenticationsService, usersService, tokenManager, validator) {
     this._authenticationsService = authenticationsService
     this._usersService = usersService
     this._tokenManager = tokenManager
@@ -12,7 +12,7 @@ class AuthenticationsHandler {
     this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(this)
   }
 
-  async postAuthenticationHandler(request, h) {
+  async postAuthenticationHandler (request, h) {
     try {
       this._validator.validatePostAuthenticationPayload(request.payload)
 
@@ -25,8 +25,8 @@ class AuthenticationsHandler {
       await this._authenticationsService.addRefreshToken(refreshToken)
 
       const response = h.response({
-        status: "success",
-        message: "Authentication berhasil ditambahkan",
+        status: 'success',
+        message: 'Authentication berhasil ditambahkan',
         data: {
           accessToken,
           refreshToken
@@ -54,7 +54,7 @@ class AuthenticationsHandler {
     }
   }
 
-  async putAuthenticationHandler(request, h) {
+  async putAuthenticationHandler (request, h) {
     try {
       this._validator.validatePutAuthenticationPayload(request.payload)
 
@@ -72,7 +72,6 @@ class AuthenticationsHandler {
         }
       }
     } catch (error) {
-      
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -92,7 +91,7 @@ class AuthenticationsHandler {
     }
   }
 
-  async deleteAuthenticationHandler(request, h) {
+  async deleteAuthenticationHandler (request, h) {
     try {
       this._validator.validateDeleteAuthenticationPayload(request.payload)
 
