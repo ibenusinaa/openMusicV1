@@ -110,6 +110,7 @@ class PlaylistsHandler {
       response.code(201)
       return response
     } catch (error) {
+      console.log(error)
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -143,6 +144,7 @@ class PlaylistsHandler {
         }
       }
     } catch (error) {
+      console.log(error)
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -176,6 +178,7 @@ class PlaylistsHandler {
         message: 'Lagu berhasil dihapus dari playlist'
       }
     } catch (error) {
+      console.log(error)
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',

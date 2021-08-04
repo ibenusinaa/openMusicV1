@@ -1,6 +1,9 @@
 require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
+const path = require('path')
+const Inert = require('@hapi/inert')
+
 const songs = require('./api/openMusic')
 const OpenMusicService = require('./services/postgres/openMusicService')
 const SongsValidator = require('./validator/openMusic')
@@ -26,12 +29,28 @@ const collaborations = require('./api/collaborations')
 const CollaborationsService = require('./services/postgres/collaborationsService')
 const CollaborationsValidator = require('./validator/collaborations')
 
+// exports
+const _exports = require('./api/exports')
+const ProducerService = require('./services/postgres/producerService')
+const ExportsValidator = require('./validator/exports')
+
+// uploads
+const uploads = require('./api/uploads')
+const StorageService = require('./services/postgres/storageService')
+const UploadsValidator = require('./validator/uploads')
+
+// cacheService
+const CacheService = require('./services/postgres/cacheService')
+
+
 const init = async () => {
+  const cacheService = new CacheService()
   const openMusicService = new OpenMusicService()
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsService()
-  const collaborationsService = new CollaborationsService()
-  const playlistsService = new PlaylistsService(collaborationsService)
+  const collaborationsService = new CollaborationsService(cacheService)
+  const playlistsService = new PlaylistsService(collaborationsService, cacheService)
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'))
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -43,9 +62,14 @@ const init = async () => {
     }
   })
 
-  await server.register({
-    plugin: Jwt
-  })
+  await server.register([
+    {
+      plugin: Jwt
+    },
+    {
+      plugin: Inert
+    }
+  ])
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
     keys: process.env.ACCESS_TOKEN_KEY,
@@ -101,6 +125,21 @@ const init = async () => {
         collaborationsService,
         playlistsService,
         validator: CollaborationsValidator
+      }
+    },
+    {
+      plugin: _exports,
+      options: {
+        ProducerService,
+        playlistsService,
+        validator: ExportsValidator
+      }
+    },
+    {
+      plugin: uploads,
+      options: {
+        service: storageService,
+        validator: UploadsValidator
       }
     }
   ])

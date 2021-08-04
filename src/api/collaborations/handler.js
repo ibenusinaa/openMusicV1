@@ -30,6 +30,7 @@ class CollaborationsHandler {
       response.code(201)
       return response
     } catch (error) {
+
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -62,6 +63,7 @@ class CollaborationsHandler {
         message: 'Kolaborasi berhasil dihapus'
       }
     } catch (error) {
+
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',

@@ -5,9 +5,10 @@ const NotFoundError = require('../../exceptions/NotFoundError')
 const AuthorizationError = require('../../exceptions/AuthrozationError')
 
 class PlaylistsService {
-  constructor (collaborationService) {
+  constructor (collaborationService, cacheService) {
     this._pool = new Pool()
     this._collaborationService = collaborationService
+    this._cacheService = cacheService
   }
 
   async createPlaylist (name, owner) {
@@ -20,6 +21,8 @@ class PlaylistsService {
     const result = await this._pool.query(query)
 
     if (!result.rows[0].id) throw new InvariantError('Playlist gagal dibuat')
+
+    
     return result.rows[0].id
   }
 
@@ -34,6 +37,8 @@ class PlaylistsService {
     }
 
     const result = await this._pool.query(query)
+
+    
     return result.rows
   }
 
@@ -64,12 +69,14 @@ class PlaylistsService {
   async addSongToPlaylist (playlistId, songId) {
     const id = `playlistsong-${nanoid(16)}`
     const query = {
-      text: 'INSERT INTO playlistsongs VALUES($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO playlistsongs VALUES($1, $2, $3) RETURNING id, playlist_id',
       values: [id, playlistId, songId]
     }
 
     const result = await this._pool.query(query)
     if (!result.rows.length) throw new InvariantError('Lagu gagal ditambahkan ke dalam playlist')
+    const { playlist_id } = result.rows[0]
+    await this._cacheService.delete(`songlist-playlist${playlist_id}`)
   }
 
   async getSongsOnPlaylist (playlistId) {
@@ -81,17 +88,21 @@ class PlaylistsService {
     const result = await this._pool.query(query)
 
     if (!result.rows.length) throw NotFoundError('Tidak tedapat lagu pada playlist ini')
+
+    await this._cacheService.set(`songlist-playlist${playlistId}`, JSON.stringify(result.rows))
     return result.rows
   }
 
   async deleteSongFromPlaylist (playlistId, songId) {
     const query = {
-      text: 'DELETE from playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      text: 'DELETE from playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id, playlist_id',
       values: [playlistId, songId]
     }
 
     const result = await this._pool.query(query)
     if (!result.rowCount) throw new InvariantError('Lagu gagal dihapus playlist tidak ditemukan')
+    const { playlist_id } = result.rows[0]
+    await this._cacheService.delete(`songlist-playlist${playlist_id}`)
   }
 
   async verifySongId (id) {
