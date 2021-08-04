@@ -31,16 +31,16 @@ const CollaborationsValidator = require('./validator/collaborations')
 
 // exports
 const _exports = require('./api/exports')
-const ProducerService = require('./services/postgres/producerService')
+const ProducerService = require('./services/rabbitMQ/producerService')
 const ExportsValidator = require('./validator/exports')
 
 // uploads
 const uploads = require('./api/uploads')
-const StorageService = require('./services/postgres/storageService')
+const StorageService = require('./services/storage/storageService')
 const UploadsValidator = require('./validator/uploads')
 
 // cacheService
-const CacheService = require('./services/postgres/cacheService')
+const CacheService = require('./services/redis/cacheService')
 
 
 const init = async () => {
